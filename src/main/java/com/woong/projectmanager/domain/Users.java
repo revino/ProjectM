@@ -1,6 +1,7 @@
 package com.woong.projectmanager.domain;
 
 import com.sun.istack.NotNull;
+import com.woong.projectmanager.provider.LoginProviderType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Builder
 @Getter @NoArgsConstructor @AllArgsConstructor
 public class Users {
 
@@ -29,8 +31,21 @@ public class Users {
     @Column(length = 10)
     private String nickName;
 
+    @Column()
+    private String picture;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChannel> channelList = new ArrayList<>();
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column
+    private RoleType role;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private LoginProviderType loginProviderType;
 
     @NotNull
     private LocalDateTime createdAt;
@@ -67,5 +82,17 @@ public class Users {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
+    }
+
+    public void setLoginProviderType(LoginProviderType loginProviderType) {
+        this.loginProviderType = loginProviderType;
     }
 }
