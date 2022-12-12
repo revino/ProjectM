@@ -3,21 +3,17 @@ package com.woong.projectmanager.service;
 import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
-import com.woong.projectmanager.dto.ChannelDto;
+import com.woong.projectmanager.dto.ChannelCreateRequestDto;
 import com.woong.projectmanager.dto.ItemDto;
-import com.woong.projectmanager.dto.UserDto;
+import com.woong.projectmanager.dto.UserSignUpRequestDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.CharArrayReader;
 import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -34,13 +30,13 @@ class ItemServiceTest {
 
     @Test
     public void 아이템생성(){
-        UserDto userDto = new UserDto();
+        UserSignUpRequestDto userDto = new UserSignUpRequestDto();
         userDto.setEmail("test@test.com");
         userDto.setPassword("1234");
         userDto.setNickName("testName");
         Users user = userService.signUp(userDto);
 
-        ChannelDto channelDto = new ChannelDto();
+        ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
         channelDto.setName("테스트채널");
         channelDto.setManagerEmail(userDto.getEmail());
         Channel channel = channelService.createChannel(channelDto);
@@ -62,13 +58,13 @@ class ItemServiceTest {
 
     @Test
     public void 아이템삭제(){
-        UserDto userDto = new UserDto();
+        UserSignUpRequestDto userDto = new UserSignUpRequestDto();
         userDto.setEmail("test@test.com");
         userDto.setPassword("1234");
         userDto.setNickName("testName");
         Users user = userService.signUp(userDto);
 
-        ChannelDto channelDto = new ChannelDto();
+        ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
         channelDto.setName("테스트채널");
         channelDto.setManagerEmail(userDto.getEmail());
         Channel channel = channelService.createChannel(channelDto);

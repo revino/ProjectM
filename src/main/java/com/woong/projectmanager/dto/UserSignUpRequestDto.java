@@ -1,6 +1,8 @@
 package com.woong.projectmanager.dto;
 
+import com.woong.projectmanager.domain.RoleType;
 import com.woong.projectmanager.domain.Users;
+import com.woong.projectmanager.provider.LoginProviderType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class UserSignUpRequestDto {
 
     @NotEmpty
     private String email;
@@ -24,11 +26,6 @@ public class UserDto {
     @NotEmpty
     private String nickName;
 
-    public UserDto(Users users){
-        this.email = users.getEmail();
-        this.nickName = users.getNickName();
-    }
-
     public Users toEntity(){
 
         Users user = new Users();
@@ -36,6 +33,8 @@ public class UserDto {
         user.setEmail(this.email);
         user.setPassword(this.password);
         user.setNickName(this.nickName);
+        user.setLoginProviderType(LoginProviderType.LOCAL);
+        user.setRole(RoleType.USER);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 

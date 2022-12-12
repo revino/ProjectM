@@ -3,7 +3,6 @@ package com.woong.projectmanager.service;
 import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
-import com.woong.projectmanager.dto.ChannelDto;
 import com.woong.projectmanager.dto.ItemDto;
 import com.woong.projectmanager.repository.ChannelRepository;
 import com.woong.projectmanager.repository.ItemRepository;
