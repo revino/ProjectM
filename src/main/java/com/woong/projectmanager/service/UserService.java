@@ -103,7 +103,7 @@ public class UserService {
         List<ChannelResponseDto> channelDtoList = new ArrayList<>();
 
         for(var el : user.getChannelList()){
-            ChannelResponseDto channelDto = new ChannelResponseDto();
+            ChannelResponseDto channelDto = new    ChannelResponseDto();
             Channel channel = el.getChannel();
             channelDto.setManagerEmail(channel.getManager().getEmail());
             channelDto.setName(channel.getName());

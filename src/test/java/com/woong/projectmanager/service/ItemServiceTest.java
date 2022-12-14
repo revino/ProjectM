@@ -4,6 +4,7 @@ import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.ChannelCreateRequestDto;
+import com.woong.projectmanager.dto.ChannelResponseDto;
 import com.woong.projectmanager.dto.ItemDto;
 import com.woong.projectmanager.dto.UserSignUpRequestDto;
 import org.junit.jupiter.api.Assertions;
@@ -38,8 +39,7 @@ class ItemServiceTest {
 
         ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
         channelDto.setName("테스트채널");
-        channelDto.setManagerEmail(userDto.getEmail());
-        Channel channel = channelService.createChannel(channelDto);
+        ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
         ItemDto itemDto = new ItemDto();
         itemDto.setName("테스트 아이템");
@@ -66,8 +66,7 @@ class ItemServiceTest {
 
         ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
         channelDto.setName("테스트채널");
-        channelDto.setManagerEmail(userDto.getEmail());
-        Channel channel = channelService.createChannel(channelDto);
+        ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
         ItemDto itemDto = new ItemDto();
         itemDto.setName("테스트 아이템");

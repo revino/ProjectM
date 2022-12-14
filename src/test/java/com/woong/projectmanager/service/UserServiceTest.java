@@ -62,8 +62,7 @@ class UserServiceTest {
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
         //when
-        Long channelId = channelService.findChannel(channel.getName());
-        userService.addChannel(user.getEmail(), channelId);
+        userService.addChannel(user.getEmail(), channel.getId());
 
         //then
         var list= userService.getChannelList(user.getEmail());
@@ -87,9 +86,8 @@ class UserServiceTest {
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
         //when
-        Long channelId = channelService.findChannel(channel.getName());
-        userService.addChannel(user.getEmail(), channelId);
-        userService.removeChannel(user.getEmail(), channelId);
+        userService.addChannel(user.getEmail(), channel.getId());
+        userService.removeChannel(user.getEmail(), channel.getId());
 
         //then
         var list= userService.getChannelList(user.getEmail());

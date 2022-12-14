@@ -31,6 +31,7 @@ public class ChannelService {
         channelRepository.save(channel);
 
         ChannelResponseDto channelResponseDto = new ChannelResponseDto();
+        channelResponseDto.setId(channel.getId());
         channelResponseDto.setCreatedAt(channel.getCreatedAt());
         channelResponseDto.setName(channel.getName());
         channelResponseDto.setManagerEmail(channel.getManager().getEmail());

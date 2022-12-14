@@ -18,6 +18,9 @@ import java.util.List;
 public class ChannelResponseDto {
 
     @NotEmpty
+    private Long id;
+
+    @NotEmpty
     private String name;
 
     @NotEmpty
