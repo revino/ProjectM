@@ -28,7 +28,7 @@ public class Channel {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
     private List<UserChannel> memberList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> itemList = new ArrayList<>();
 
     @NotNull

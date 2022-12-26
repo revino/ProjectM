@@ -1,4 +1,4 @@
-package com.woong.projectmanager.dto;
+package com.woong.projectmanager.dto.response;
 
 import com.sun.istack.NotNull;
 import com.woong.projectmanager.domain.Channel;
@@ -28,5 +28,13 @@ public class ChannelResponseDto {
 
     @NotEmpty
     private LocalDateTime createdAt;
+
+    public ChannelResponseDto(Channel channel){
+        this.id = channel.getId();
+        this.name = channel.getName();
+        this.managerEmail = channel.getManager().getEmail();
+        this.createdAt = channel.getCreatedAt();
+    }
+
 
 }
