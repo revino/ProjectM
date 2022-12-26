@@ -1,4 +1,4 @@
-package com.woong.projectmanager.dto;
+package com.woong.projectmanager.dto.response;
 
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.provider.LoginProviderType;
@@ -20,6 +20,11 @@ public class UserResponseDto {
 
     private LoginProviderType loginProviderType;
 
-
+    public UserResponseDto(Users users){
+        this.email = users.getEmail();
+        this.nickName = users.getNickName();
+        this.picture = users.getPicture();
+        this.loginProviderType = users.getLoginProviderType();
+    }
 
 }

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woong.projectmanager.common.Message;
 import com.woong.projectmanager.common.StatusEnum;
 import com.woong.projectmanager.domain.Users;
-import com.woong.projectmanager.dto.UserResponseDto;
-import com.woong.projectmanager.dto.UserSignUpRequestDto;
-import com.woong.projectmanager.dto.UserSignInRequestDto;
+import com.woong.projectmanager.dto.response.UserResponseDto;
+import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
+import com.woong.projectmanager.dto.request.UserSignInRequestDto;
 import com.woong.projectmanager.exception.EmailSignInFailedException;
 import com.woong.projectmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,20 @@ public class UserController {
 
     private final ObjectMapper objectMapper;
 
-    @GetMapping("/signIn")
+    @GetMapping("/hello")
+    public ResponseEntity<Message> hello(HttpServletRequest request,
+                                         HttpServletResponse response) throws JsonProcessingException {
+
+        Message message = new Message();
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("hello");
+        message.setData("hello");
+
+        return ResponseEntity.ok().body(message);
+    }
+
+    @GetMapping("/user/login")
     public ResponseEntity<Message> signIn(@RequestBody @Valid UserSignInRequestDto userSignInRequestDto,
                                           HttpServletRequest request,
                                           HttpServletResponse response,
@@ -54,7 +67,23 @@ public class UserController {
         return ResponseEntity.ok().body(message);
     }
 
-    @PostMapping("/signUp")
+    @GetMapping("/user")
+    public ResponseEntity<Message> signIn(HttpServletRequest request) throws JsonProcessingException {
+
+        Message message = new Message();
+
+        String requestEmail = userService.getUserEmail(request);
+
+        UserResponseDto userResponseDto = userService.findUserEmail(requestEmail);
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("회원 정보 반환 성공");
+        message.setData(userResponseDto);
+
+        return ResponseEntity.ok().body(message);
+    }
+
+    @PostMapping("/user")
     public ResponseEntity<Message> signUp(@RequestBody @Valid UserSignUpRequestDto userSignUpRequestDto,
                                           HttpServletRequest request,
                                           HttpServletResponse response,

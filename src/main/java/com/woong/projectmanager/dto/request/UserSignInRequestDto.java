@@ -1,4 +1,4 @@
-package com.woong.projectmanager.dto;
+package com.woong.projectmanager.dto.request;
 
 import com.woong.projectmanager.provider.LoginProviderType;
 import lombok.Data;

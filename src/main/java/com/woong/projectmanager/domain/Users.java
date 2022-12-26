@@ -23,7 +23,6 @@ public class Users {
     @Column(unique = true, length = 250)
     private String email;
 
-    @NotNull
     @Column(length = 100)
     private String password;
 

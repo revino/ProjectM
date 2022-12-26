@@ -1,10 +1,10 @@
 package com.woong.projectmanager.service;
 
-import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.Users;
-import com.woong.projectmanager.dto.ChannelCreateRequestDto;
-import com.woong.projectmanager.dto.ChannelResponseDto;
-import com.woong.projectmanager.dto.UserSignUpRequestDto;
+import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
+import com.woong.projectmanager.dto.response.ChannelResponseDto;
+import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
+import com.woong.projectmanager.dto.response.UserResponseDto;
 import com.woong.projectmanager.repository.ChannelRepository;
 import com.woong.projectmanager.repository.UsersRepository;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +42,7 @@ class UserServiceTest {
         userService.signUp(userDto);
 
         //then
-        Users user = userService.findUserEmail(userDto.getEmail());
+        UserResponseDto user = userService.findUserEmail(userDto.getEmail());
 
         Assertions.assertEquals(user.getEmail(), userDto.getEmail());
     }

@@ -4,11 +4,12 @@ import com.woong.projectmanager.domain.UserRefreshToken;
 import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.UserChannel;
 import com.woong.projectmanager.domain.Users;
-import com.woong.projectmanager.dto.ChannelCreateRequestDto;
-import com.woong.projectmanager.dto.ChannelResponseDto;
-import com.woong.projectmanager.dto.UserSignUpRequestDto;
-import com.woong.projectmanager.dto.UserSignInRequestDto;
+import com.woong.projectmanager.dto.response.ChannelResponseDto;
+import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
+import com.woong.projectmanager.dto.request.UserSignInRequestDto;
+import com.woong.projectmanager.dto.response.UserResponseDto;
 import com.woong.projectmanager.exception.AccessTokenFailedException;
+import com.woong.projectmanager.exception.ChannelSubscribeFailedException;
 import com.woong.projectmanager.exception.EmailSignInFailedException;
 import com.woong.projectmanager.exception.PasswordSignInFailedException;
 import com.woong.projectmanager.properties.AppProperties;
@@ -25,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 
@@ -66,49 +67,82 @@ public class UserService {
     }
 
     @Transactional
-    public void addChannel(String email, Long channelId){
+    public List<ChannelResponseDto> addChannel(String email, Long channelId){
         Users member = usersRepository.findByEmail(email).orElseThrow();
         Channel channel = channelRepository.findById(channelId).orElseThrow();
+
+        //중복 구독 체크
+        if(!checkSubscribe(member, channel)){
+            throw new ChannelSubscribeFailedException("이미 구독 중인 채널입니다.");
+        }
 
         //유저채널 생성
         UserChannel userChannel = UserChannel.createUserChannel(member, channel);
 
         //채널 추가
         member.addChannel(userChannel);
+
+        ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
+
+        return getChannelList(member);
     }
 
     @Transactional
-    public void removeChannel(String email, Long channelId){
+    public List<ChannelResponseDto> addChannel(Users user, Channel channel){
+
+        //유저채널 생성
+        UserChannel userChannel = UserChannel.createUserChannel(user, channel);
+
+        //중복 구독 체크
+        if(!checkSubscribe(user, channel)){
+            throw new ChannelSubscribeFailedException("이미 구독 중인 채널입니다.");
+        }
+
+        //채널 추가
+        user.addChannel(userChannel);
+
+        return getChannelList(user);
+    }
+
+    @Transactional
+    public List<ChannelResponseDto> removeChannel(String email, Long channelId){
         Users member = usersRepository.findByEmail(email).orElseThrow();
         Channel channel = channelRepository.findById(channelId).orElseThrow();
 
         //유저채널 찾기
-        UserChannel userChannel = userChannelRepository.findByUserAndChannel(member, channel).orElseThrow();
+        UserChannel userChannel = userChannelRepository.findByUserAndChannel(member, channel)
+                .orElseThrow(() -> new ChannelSubscribeFailedException("찾을 수 없는 채널입니다."));
 
         //채널 제거
         member.removeChannel(userChannel);
         usersRepository.save(member);
+
+        return getChannelList(member);
     }
 
-    public Users findUserEmail(String email){
+    public UserResponseDto findUserEmail(String email){
         Users user = usersRepository.findByEmail(email).orElseThrow();
 
-        return user;
+        return new UserResponseDto(user);
     }
 
     public List<ChannelResponseDto> getChannelList(String email){
         Users user = usersRepository.findByEmail(email).orElseThrow();
 
         //Dto 생성하여 반환
-        List<ChannelResponseDto> channelDtoList = new ArrayList<>();
+        List<ChannelResponseDto> channelDtoList = user
+                                                .getChannelList().stream()
+                                                .map(el -> new ChannelResponseDto(el.getChannel())).collect(Collectors.toList());
 
-        for(var el : user.getChannelList()){
-            ChannelResponseDto channelDto = new    ChannelResponseDto();
-            Channel channel = el.getChannel();
-            channelDto.setManagerEmail(channel.getManager().getEmail());
-            channelDto.setName(channel.getName());
-            channelDtoList.add(channelDto);
-        }
+        return channelDtoList;
+    }
+
+    public List<ChannelResponseDto> getChannelList(Users user){
+
+        //Dto 생성하여 반환
+        List<ChannelResponseDto> channelDtoList = user
+                .getChannelList().stream()
+                .map(el -> new ChannelResponseDto(el.getChannel())).collect(Collectors.toList());
 
         return channelDtoList;
     }
@@ -120,6 +154,12 @@ public class UserService {
                 appProperties.getAuth().getTokenExpiry());
     }
 
+    private boolean checkSubscribe(Users user, Channel channel){
+
+        return userChannelRepository.findByUserAndChannel(user, channel).isEmpty();
+
+    }
+
     @Transactional
     public void makeRefreshToken(String id, HttpServletRequest request, HttpServletResponse response){
         //Refresh token create
@@ -128,13 +168,17 @@ public class UserService {
                 appProperties.getAuth().getRefreshTokenExpiry());
 
         //Refresh token DB Save
-        UserRefreshToken userRefreshToken = accountRefreshTokenRepository.findByUserId(id).
-                orElse(accountRefreshTokenRepository.save(
-                        UserRefreshToken.builder()
-                                .userId(id)
-                                .refreshToken(refreshToken).build()));
+        UserRefreshToken userRefreshToken = accountRefreshTokenRepository.findByUserId(id).orElse(null);
 
-        userRefreshToken.setRefreshToken(refreshToken);
+        if(userRefreshToken == null){
+            userRefreshToken = accountRefreshTokenRepository.save(
+                    UserRefreshToken.builder()
+                            .userId(id)
+                            .refreshToken(refreshToken).build());
+        }
+        else {
+            userRefreshToken.setRefreshToken(refreshToken);
+        }
 
         int cookieMaxAge = (int) (appProperties.getAuth().getRefreshTokenExpiry() / 1000 / 60); //minute
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
@@ -142,7 +186,7 @@ public class UserService {
     }
 
     @Transactional
-    public String gerUserEmail(HttpServletRequest request){
+    public String getUserEmail(HttpServletRequest request){
 
         String accessToken = jwtTokenProvider.resolveToken(request);
 
@@ -151,6 +195,12 @@ public class UserService {
             throw new AccessTokenFailedException();
         }
 
-        return jwtTokenProvider.getUserEmail(accessToken);
+        String email = jwtTokenProvider.getUserEmail(accessToken);
+
+        if(email.isEmpty()){
+            throw new AccessTokenFailedException();
+        }
+
+        return email;
     }
 }
