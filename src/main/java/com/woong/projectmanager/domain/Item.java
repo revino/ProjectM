@@ -1,6 +1,7 @@
 package com.woong.projectmanager.domain;
 
 import com.sun.istack.NotNull;
+import com.woong.projectmanager.dto.request.ItemAddRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,13 @@ public class Item {
     public void addContents(Contents contents){
         contentsList.add(contents);
         contents.setItem(this);
+    }
+
+    public void update(ItemAddRequestDto itemAddRequestDto){
+        this.name = itemAddRequestDto.getName();
+        this.status = itemAddRequestDto.getStatus();
+        this.startDate = itemAddRequestDto.getStartDate();
+        this.endDate = itemAddRequestDto.getEndDate();
     }
 
 

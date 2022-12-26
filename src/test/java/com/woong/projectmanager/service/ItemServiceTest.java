@@ -1,12 +1,11 @@
 package com.woong.projectmanager.service;
 
-import com.woong.projectmanager.domain.Channel;
-import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
-import com.woong.projectmanager.dto.ChannelCreateRequestDto;
-import com.woong.projectmanager.dto.ChannelResponseDto;
-import com.woong.projectmanager.dto.ItemDto;
-import com.woong.projectmanager.dto.UserSignUpRequestDto;
+import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
+import com.woong.projectmanager.dto.request.ItemAddRequestDto;
+import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
+import com.woong.projectmanager.dto.response.ChannelResponseDto;
+import com.woong.projectmanager.dto.response.ItemResponseDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -41,14 +41,13 @@ class ItemServiceTest {
         channelDto.setName("테스트채널");
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
-        ItemDto itemDto = new ItemDto();
+        ItemAddRequestDto itemDto = new ItemAddRequestDto();
         itemDto.setName("테스트 아이템");
-        itemDto.setWriterEmail(userDto.getEmail());
         itemDto.setStartDate(LocalDate.now());
         itemDto.setEndDate(LocalDate.now().plusDays(1));
         itemDto.setChannelId(channel.getId());
         itemDto.setStatus("대기중");
-        Item item = itemService.createItem(itemDto);
+        ItemResponseDto itemResponseDto = itemService.createItem(itemDto, userDto.getEmail());
 
         //
         var list = itemService.getItemList(channel.getId());
@@ -68,17 +67,16 @@ class ItemServiceTest {
         channelDto.setName("테스트채널");
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
-        ItemDto itemDto = new ItemDto();
+        ItemAddRequestDto itemDto = new ItemAddRequestDto();
         itemDto.setName("테스트 아이템");
-        itemDto.setWriterEmail(userDto.getEmail());
         itemDto.setStartDate(LocalDate.now());
         itemDto.setEndDate(LocalDate.now().plusDays(1));
         itemDto.setChannelId(channel.getId());
         itemDto.setStatus("대기중");
-        Item item = itemService.createItem(itemDto);
+        ItemResponseDto itemResponseDto = itemService.createItem(itemDto, userDto.getEmail());
 
         //
-        itemService.removeItem(item.getId());
+        itemService.removeItem(itemResponseDto.getId(), userDto.getEmail());
 
         //
         var list = itemService.getItemList(channel.getId());

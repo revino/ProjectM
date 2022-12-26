@@ -1,38 +1,28 @@
-package com.woong.projectmanager.dto;
+package com.woong.projectmanager.dto.request;
 
-import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.Item;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class ItemDto {
+@Data @NoArgsConstructor
+public class ItemAddRequestDto {
 
     @NotEmpty
     private String name;
 
-    @NotEmpty
-    private String writerEmail;
-
-    @NotEmpty
     private Long channelId;
 
     @NotEmpty
     private String status;
 
-    @NotEmpty
+    @NotNull
     private LocalDate startDate;
 
-    @NotEmpty
+    @NotNull
     private LocalDate endDate;
 
     public Item toEntity() {
