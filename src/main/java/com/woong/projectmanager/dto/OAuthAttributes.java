@@ -6,6 +6,7 @@ import com.woong.projectmanager.provider.LoginProviderType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
@@ -57,6 +58,8 @@ public class OAuthAttributes {
                 .picture(picture)
                 .loginProviderType(loginProviderType)
                 .role(RoleType.USER)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }
