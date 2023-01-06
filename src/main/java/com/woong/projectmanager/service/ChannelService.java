@@ -2,6 +2,7 @@ package com.woong.projectmanager.service;
 
 import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.Item;
+import com.woong.projectmanager.domain.UserChannel;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
 import com.woong.projectmanager.dto.response.ChannelResponseDto;
@@ -10,6 +11,7 @@ import com.woong.projectmanager.exception.*;
 import com.woong.projectmanager.repository.ChannelRepository;
 import com.woong.projectmanager.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +81,12 @@ public class ChannelService {
         //관리자 아이디 확인
         if(!managerEmail.equals(requestEmail)){
             throw new RemoveChannelFailedException("수정 권하이 없습니다. " + managerEmail);
+        }
+
+        //구독자 해제
+        for (UserChannel userChannel: channel.getMemberList()) {
+            Users user = userChannel.getUser();
+            user.removeChannel(userChannel);
         }
 
         //삭제

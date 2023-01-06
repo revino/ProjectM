@@ -55,6 +55,5 @@ public class Channel {
 
     public void update(ChannelCreateRequestDto channelCreateRequestDto){
         this.name = channelCreateRequestDto.getName();
-
     }
 }
