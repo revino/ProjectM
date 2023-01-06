@@ -36,5 +36,13 @@ public class ChannelResponseDto {
         this.createdAt = channel.getCreatedAt();
     }
 
+    public ChannelResponseDto(UserChannel userChannel){
+        Channel channel = userChannel.getChannel();
+        this.id = channel.getId();
+        this.name = channel.getName();
+        this.managerEmail = channel.getManager().getEmail();
+        this.createdAt = channel.getCreatedAt();
+    }
+
 
 }
