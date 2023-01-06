@@ -48,6 +48,11 @@ public class ChannelService {
     @Transactional
     public ChannelResponseDto updateChannel(Long channelId, ChannelCreateRequestDto channelCreateRequestDto, String requestEmail){
 
+        //validation
+        if(channelCreateRequestDto.getName().length() >= 10) {
+            throw new ChannelUpdateValidException("채널 이름이 10자 이상입니다." );
+        }
+
         Channel channel = channelRepository.findById(channelId).orElseThrow(()-> new ItemFindFailedException("존재하지 않는 채널입니다."));
         String managerEmail = channel.getManager().getEmail();
 
