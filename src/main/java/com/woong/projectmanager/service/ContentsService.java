@@ -5,6 +5,7 @@ import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.request.ContentsAddRequestDto;
 import com.woong.projectmanager.dto.response.ContentsResponseDto;
+import com.woong.projectmanager.exception.ContentFindFailedException;
 import com.woong.projectmanager.exception.ItemFindFailedException;
 import com.woong.projectmanager.exception.UserFindFailedException;
 import com.woong.projectmanager.repository.ChannelRepository;
@@ -52,7 +53,7 @@ public class ContentsService {
 
         Item item = itemRepository.findById(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        var contentsList = contentsRepository.findAllByItem(item, sort).orElseThrow();
+        var contentsList = contentsRepository.findAllByItem(item, sort).orElseThrow(()->new ContentFindFailedException("컨텐츠가 존재 하지 않습니다."));
 
         //DTO 생성하여 반환
         List<ContentsResponseDto> contentsDtoList = new ArrayList<>();

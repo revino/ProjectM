@@ -54,8 +54,6 @@ public class ContentsController {
                                                HttpServletRequest request){
         Message message = new Message();
 
-        String managerEmail = userService.getUserEmail(request);
-
         //아이템 생성
         List<ContentsResponseDto> contentsResponseDtoList = contentsService.getContentsList(id);
 
