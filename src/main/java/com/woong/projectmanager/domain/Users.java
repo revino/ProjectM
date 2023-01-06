@@ -36,6 +36,10 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChannel> channelList = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id")
+    private Channel currentChannel;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column
@@ -93,5 +97,9 @@ public class Users {
 
     public void setLoginProviderType(LoginProviderType loginProviderType) {
         this.loginProviderType = loginProviderType;
+    }
+
+    public void setCurrentChannel(Channel currentChannel) {
+        this.currentChannel = currentChannel;
     }
 }

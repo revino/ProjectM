@@ -8,10 +8,7 @@ import com.woong.projectmanager.dto.response.ChannelResponseDto;
 import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
 import com.woong.projectmanager.dto.request.UserSignInRequestDto;
 import com.woong.projectmanager.dto.response.UserResponseDto;
-import com.woong.projectmanager.exception.AccessTokenFailedException;
-import com.woong.projectmanager.exception.ChannelSubscribeFailedException;
-import com.woong.projectmanager.exception.EmailSignInFailedException;
-import com.woong.projectmanager.exception.PasswordSignInFailedException;
+import com.woong.projectmanager.exception.*;
 import com.woong.projectmanager.properties.AppProperties;
 import com.woong.projectmanager.provider.JwtTokenProvider;
 import com.woong.projectmanager.repository.AccountRefreshTokenRepository;
@@ -68,8 +65,8 @@ public class UserService {
 
     @Transactional
     public List<ChannelResponseDto> addChannel(String email, Long channelId){
-        Users member = usersRepository.findByEmail(email).orElseThrow();
-        Channel channel = channelRepository.findById(channelId).orElseThrow();
+        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
         //중복 구독 체크
         if(!checkSubscribe(member, channel)){
@@ -105,9 +102,25 @@ public class UserService {
     }
 
     @Transactional
+    public ChannelResponseDto setCurrentChannel(String email, Long channelId){
+        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
+
+        //중복 구독 체크
+        if(checkSubscribe(member, channel)){
+            throw new ChannelSubscribeFailedException("변경 불가능한 채널입니다.");
+        }
+
+        //채널 설정
+        member.setCurrentChannel(channel);
+
+        return new ChannelResponseDto(channel);
+    }
+
+    @Transactional
     public List<ChannelResponseDto> removeChannel(String email, Long channelId){
-        Users member = usersRepository.findByEmail(email).orElseThrow();
-        Channel channel = channelRepository.findById(channelId).orElseThrow();
+        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
         //유저채널 찾기
         UserChannel userChannel = userChannelRepository.findByUserAndChannel(member, channel)
@@ -121,13 +134,13 @@ public class UserService {
     }
 
     public UserResponseDto findUserEmail(String email){
-        Users user = usersRepository.findByEmail(email).orElseThrow();
+        Users user = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
         return new UserResponseDto(user);
     }
 
     public List<ChannelResponseDto> getChannelList(String email){
-        Users user = usersRepository.findByEmail(email).orElseThrow();
+        Users user = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
         //Dto 생성하여 반환
         List<ChannelResponseDto> channelDtoList = user

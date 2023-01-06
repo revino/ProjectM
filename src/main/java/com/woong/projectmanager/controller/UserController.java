@@ -5,22 +5,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woong.projectmanager.common.Message;
 import com.woong.projectmanager.common.StatusEnum;
 import com.woong.projectmanager.domain.Users;
+import com.woong.projectmanager.dto.response.ChannelResponseDto;
 import com.woong.projectmanager.dto.response.UserResponseDto;
 import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
 import com.woong.projectmanager.dto.request.UserSignInRequestDto;
 import com.woong.projectmanager.exception.EmailSignInFailedException;
+import com.woong.projectmanager.exception.FormValidException;
 import com.woong.projectmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -52,7 +52,7 @@ public class UserController {
         Message message = new Message();
 
         if (errors.hasErrors()) {
-            throw new EmailSignInFailedException(objectMapper.writeValueAsString(errors));
+            throw new FormValidException(objectMapper.writeValueAsString(errors));
         }
 
         String token = userService.signIn(userSignInRequestDto);
@@ -92,21 +92,33 @@ public class UserController {
         Message message = new Message();
 
         if (errors.hasErrors()) {
-            throw new EmailSignInFailedException(objectMapper.writeValueAsString(errors));
+            throw new FormValidException(objectMapper.writeValueAsString(errors));
         }
 
         Users user = userService.signUp(userSignUpRequestDto);
 
         //응답 메세지 설정
-        UserResponseDto userResponseDto = new UserResponseDto();
-        userResponseDto.setEmail(user.getEmail());
-        userResponseDto.setNickName(user.getNickName());
-        userResponseDto.setPicture(user.getPicture());
-        userResponseDto.setLoginProviderType(user.getLoginProviderType());
+        UserResponseDto userResponseDto = new UserResponseDto(user);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("가입 성공");
         message.setData(userResponseDto);
+
+        return ResponseEntity.ok().body(message);
+    }
+
+    @PutMapping("/user/channel/{id}")
+    public ResponseEntity<Message> changeCurrentChannel(@PathVariable Long id,
+                                                    HttpServletRequest request){
+        Message message = new Message();
+
+        String requestEmail = userService.getUserEmail(request);
+
+        ChannelResponseDto channelResponseDto = userService.setCurrentChannel(requestEmail, id);
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("현재 채널 변경 성공");
+        message.setData(channelResponseDto);
 
         return ResponseEntity.ok().body(message);
     }
