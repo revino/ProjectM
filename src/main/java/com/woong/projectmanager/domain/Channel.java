@@ -1,6 +1,8 @@
 package com.woong.projectmanager.domain;
 
 import com.sun.istack.NotNull;
+import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
+import com.woong.projectmanager.dto.request.ItemAddRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -49,5 +51,10 @@ public class Channel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void update(ChannelCreateRequestDto channelCreateRequestDto){
+        this.name = channelCreateRequestDto.getName();
+
     }
 }

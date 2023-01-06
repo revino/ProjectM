@@ -1,10 +1,12 @@
 package com.woong.projectmanager.service;
 
 import com.woong.projectmanager.domain.Channel;
+import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
 import com.woong.projectmanager.dto.response.ChannelResponseDto;
-import com.woong.projectmanager.exception.RemoveChannelFailedException;
+import com.woong.projectmanager.dto.response.ItemResponseDto;
+import com.woong.projectmanager.exception.*;
 import com.woong.projectmanager.repository.ChannelRepository;
 import com.woong.projectmanager.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,7 @@ public class ChannelService {
     public ChannelResponseDto createChannel(ChannelCreateRequestDto channelCreateRequestDto, String managerEmail){
 
         //유저 찾기
-        Users manager = usersRepository.findByEmail(managerEmail).orElseThrow();
+        Users manager = usersRepository.findByEmail(managerEmail).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
         //채널 생성
         Channel channel = channelCreateRequestDto.toEntity();
@@ -44,17 +46,37 @@ public class ChannelService {
     }
 
     @Transactional
+    public ChannelResponseDto updateChannel(Long channelId, ChannelCreateRequestDto channelCreateRequestDto, String requestEmail){
+
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()-> new ItemFindFailedException("존재하지 않는 채널입니다."));
+        String managerEmail = channel.getManager().getEmail();
+
+        if(!managerEmail.equals(requestEmail)){
+            throw new AuthenticationFailedException("수정 권한이 없습니다. " + managerEmail);
+        }
+
+        channel.update(channelCreateRequestDto);
+
+        channelRepository.save(channel);
+
+        ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
+
+        return channelResponseDto;
+    }
+
+    @Transactional
     public ChannelResponseDto removeChannel(Long id, String requestEmail){
 
         //채널 찾기
-        Channel channel = channelRepository.findById(id).orElseThrow();
+        Channel channel = channelRepository.findById(id).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
+        String managerEmail = channel.getManager().getEmail();
 
         //관리자 아이디 확인
-        if(!channel.getManager().getEmail().equals(requestEmail)){
-            throw new RemoveChannelFailedException("관리자 이메일이 일치하지 않습니다.");
+        if(!managerEmail.equals(requestEmail)){
+            throw new RemoveChannelFailedException("수정 권하이 없습니다. " + managerEmail);
         }
 
-        // 삭제
+        //삭제
         channelRepository.delete(channel);
 
         ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
@@ -63,16 +85,18 @@ public class ChannelService {
     }
 
     public Long findChannel(String name){
-        Channel channel = channelRepository.findByName(name).orElseThrow();
+        Channel channel = channelRepository.findByName(name).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
         return channel.getId();
     }
 
-    public Long findChannel(Long channelId){
+    public ChannelResponseDto findChannel(Long channelId){
 
-        Channel channel = channelRepository.findById(channelId).orElseThrow();
+        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
-        return channel.getId();
+        ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
+
+        return channelResponseDto;
     }
 
 }
