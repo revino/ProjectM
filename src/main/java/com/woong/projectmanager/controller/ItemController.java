@@ -7,6 +7,7 @@ import com.woong.projectmanager.common.StatusEnum;
 import com.woong.projectmanager.dto.request.ItemAddRequestDto;
 import com.woong.projectmanager.dto.response.ItemResponseDto;
 import com.woong.projectmanager.exception.EmailSignInFailedException;
+import com.woong.projectmanager.exception.FormValidException;
 import com.woong.projectmanager.service.ItemService;
 import com.woong.projectmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,7 @@ public class ItemController {
                                                HttpServletRequest request){
         Message message = new Message();
 
-        String managerEmail = userService.getUserEmail(request);
-
-        //아이템 생성
+        //아이템 조회
         List<ItemResponseDto> itemResponseDto = itemService.getItemList(id);
 
         message.setStatus(StatusEnum.OK);
@@ -50,7 +49,7 @@ public class ItemController {
         Message message = new Message();
 
         if (errors.hasErrors()) {
-            throw new RuntimeException(objectMapper.writeValueAsString(errors));
+            throw new FormValidException(objectMapper.writeValueAsString(errors));
         }
 
         String managerEmail = userService.getUserEmail(request);
@@ -65,6 +64,20 @@ public class ItemController {
         return ResponseEntity.ok().body(message);
     }
 
+    @GetMapping("/item/{id}")
+    public ResponseEntity<Message> getItem(@PathVariable Long id) throws JsonProcessingException {
+        Message message = new Message();
+
+        //아이템 조회
+        ItemResponseDto itemResponseDto = itemService.getItem(id);
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("아이템 조회 성공");
+        message.setData(itemResponseDto);
+
+        return ResponseEntity.ok().body(message);
+    }
+
     @PutMapping("/item/{id}")
     public ResponseEntity<Message> updateItem(@RequestBody @Valid ItemAddRequestDto itemAddRequestDto,
                                               @PathVariable Long id,
@@ -73,7 +86,7 @@ public class ItemController {
         Message message = new Message();
 
         if (errors.hasErrors()) {
-            throw new RuntimeException(objectMapper.writeValueAsString(errors));
+            throw new FormValidException(objectMapper.writeValueAsString(errors));
         }
 
         String managerEmail = userService.getUserEmail(request);
