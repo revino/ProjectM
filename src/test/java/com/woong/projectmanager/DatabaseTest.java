@@ -1,5 +1,6 @@
 package com.woong.projectmanager;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
