@@ -95,10 +95,9 @@ public class UserController {
             throw new FormValidException(objectMapper.writeValueAsString(errors));
         }
 
-        Users user = userService.signUp(userSignUpRequestDto);
+        UserResponseDto userResponseDto = userService.signUp(userSignUpRequestDto);
 
         //응답 메세지 설정
-        UserResponseDto userResponseDto = new UserResponseDto(user);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("가입 성공");

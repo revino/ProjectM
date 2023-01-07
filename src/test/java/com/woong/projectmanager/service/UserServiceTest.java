@@ -1,5 +1,6 @@
 package com.woong.projectmanager.service;
 
+import com.woong.projectmanager.DatabaseTest;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
 import com.woong.projectmanager.dto.response.ChannelResponseDto;
@@ -16,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-class UserServiceTest {
+class UserServiceTest extends DatabaseTest {
 
     @Autowired
     UsersRepository usersRepository;
@@ -58,14 +59,11 @@ class UserServiceTest {
         ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
         channelDto.setName("테스트채널");
 
-        Users user = userService.signUp(userDto);
+        UserResponseDto userResponseDto = userService.signUp(userDto);
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
-        //when
-        userService.addChannel(user.getEmail(), channel.getId());
-
         //then
-        var list= userService.getChannelList(user.getEmail());
+        var list= userService.getChannelList(userResponseDto.getEmail());
 
         Assertions.assertEquals(list.size(), 1);
         Assertions.assertEquals(list.get(0).getName(), channel.getName());
@@ -82,15 +80,14 @@ class UserServiceTest {
         ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
         channelDto.setName("테스트채널");
 
-        Users user = userService.signUp(userDto);
+        UserResponseDto userResponseDto = userService.signUp(userDto);
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
         //when
-        userService.addChannel(user.getEmail(), channel.getId());
-        userService.removeChannel(user.getEmail(), channel.getId());
+        userService.removeChannel(userResponseDto.getEmail(), channel.getId());
 
         //then
-        var list= userService.getChannelList(user.getEmail());
+        var list= userService.getChannelList(userResponseDto.getEmail());
 
         Assertions.assertEquals(list.size(), 0);
     }

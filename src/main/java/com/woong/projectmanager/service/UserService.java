@@ -42,13 +42,15 @@ public class UserService {
     private final AppProperties appProperties;
 
     @Transactional
-    public Users signUp(UserSignUpRequestDto userDto){
+    public UserResponseDto signUp(UserSignUpRequestDto userDto){
 
         String password = passwordEncoder.encode(userDto.getPassword());
 
         userDto.setPassword(password);
 
-        return usersRepository.save(userDto.toEntity());
+        Users users = usersRepository.save(userDto.toEntity());
+
+        return new UserResponseDto(users);
     }
 
     public String signIn(UserSignInRequestDto userSignInRequestDto){

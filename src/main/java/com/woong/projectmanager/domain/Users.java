@@ -33,6 +33,7 @@ public class Users {
     @Column()
     private String picture;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChannel> channelList = new ArrayList<>();
 
