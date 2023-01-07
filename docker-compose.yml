@@ -1,0 +1,31 @@
+version: "3" # 사용하고자 하는 docker-compose 버전 명시(현재 최신 버전은 3.8)
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: projectM-mysql # 컨테이너 이름(docker dashboard에 뜨는 이름)
+    restart: always # 항상 재시작(명시되어 있지 않을 경우 no가 default이며 어떤 상황에서도 restart 안함)
+    ports:
+      - "3306:3306" # HOST_PORT:CONTAINER_PORT로 host의 5433 포트를 container의 5432 포트와 매핑
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: prjoectM
+      MYSQL_USER: sa
+      MYSQL_PASSWORD: pass
+  app:
+    image: projectm:latest
+    container_name: projectM-backend
+    restart: always # 항상 재시작(명시되어 있지 않을 경우 no가 default이며 어떤 상황에서도 restart 안함)
+    ports:
+      - "8080:8080"
+    depends_on:
+      - projectM-mysql # db가 뜬 후에 app이 뜰 수 있도록 depends_on 설정
+    environment: # springboot의 application-*.yml에 주입 필요한 정보
+      PROFILE: "local"
+      SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/projectM?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: pass
+      LOGISTICS_SQS_NAME: logistics_matching
+    links:
+      - postgresdb
+volumes:
+  postgre-data:
