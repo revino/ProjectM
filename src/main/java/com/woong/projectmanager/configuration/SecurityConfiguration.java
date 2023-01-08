@@ -53,6 +53,7 @@ public class SecurityConfiguration {
                 .and()
             .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/user").permitAll()
+                .antMatchers(HttpMethod.GET, "/").permitAll()
                 .antMatchers(HttpMethod.GET, "/user/login").permitAll()
                 .antMatchers("/admin/**").hasAnyAuthority(RoleType.ADMIN.getKey())
                 .anyRequest().authenticated()
