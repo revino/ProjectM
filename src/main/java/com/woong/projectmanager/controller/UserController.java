@@ -30,20 +30,7 @@ public class UserController {
 
     private final ObjectMapper objectMapper;
 
-    @GetMapping("/hello")
-    public ResponseEntity<Message> hello(HttpServletRequest request,
-                                         HttpServletResponse response) throws JsonProcessingException {
-
-        Message message = new Message();
-
-        message.setStatus(StatusEnum.OK);
-        message.setMessage("hello");
-        message.setData("hello");
-
-        return ResponseEntity.ok().body(message);
-    }
-
-    @GetMapping("/user/login")
+    @PostMapping("/user/login")
     public ResponseEntity<Message> signIn(@RequestBody @Valid UserSignInRequestDto userSignInRequestDto,
                                           HttpServletRequest request,
                                           HttpServletResponse response,
