@@ -20,7 +20,7 @@ public class Channel {
     private Long id;
 
     @NotNull
-    @Column(length = 10)
+    @Column(length = 30)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
