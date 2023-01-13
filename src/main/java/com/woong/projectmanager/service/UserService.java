@@ -4,6 +4,7 @@ import com.woong.projectmanager.domain.UserRefreshToken;
 import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.UserChannel;
 import com.woong.projectmanager.domain.Users;
+import com.woong.projectmanager.dto.request.UserSettingRequestDto;
 import com.woong.projectmanager.dto.response.ChannelResponseDto;
 import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
 import com.woong.projectmanager.dto.request.UserSignInRequestDto;
@@ -47,6 +48,10 @@ public class UserService {
         String password = passwordEncoder.encode(userDto.getPassword());
 
         userDto.setPassword(password);
+
+        if(usersRepository.findByEmail(userDto.getEmail()).isPresent()){
+            throw new SignupFailedException("이미 가입된 계정이 있습니다.");
+        }
 
         Users users = usersRepository.save(userDto.toEntity());
 
@@ -218,4 +223,5 @@ public class UserService {
 
         return email;
     }
+
 }

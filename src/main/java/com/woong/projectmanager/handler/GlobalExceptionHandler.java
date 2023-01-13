@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailSignInFailedException.class)
-    public ResponseEntity<Message> handleException(EmailSignInFailedException ex){
-        return responseBadRequest(ex.getMessage());
-    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Message> handleException(Exception ex){

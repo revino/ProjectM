@@ -4,12 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woong.projectmanager.common.Message;
 import com.woong.projectmanager.common.StatusEnum;
-import com.woong.projectmanager.domain.Users;
+import com.woong.projectmanager.dto.request.UserSettingRequestDto;
 import com.woong.projectmanager.dto.response.ChannelResponseDto;
 import com.woong.projectmanager.dto.response.UserResponseDto;
 import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
 import com.woong.projectmanager.dto.request.UserSignInRequestDto;
-import com.woong.projectmanager.exception.EmailSignInFailedException;
 import com.woong.projectmanager.exception.FormValidException;
 import com.woong.projectmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -72,8 +70,6 @@ public class UserController {
 
     @PostMapping("/user")
     public ResponseEntity<Message> signUp(@RequestBody @Valid UserSignUpRequestDto userSignUpRequestDto,
-                                          HttpServletRequest request,
-                                          HttpServletResponse response,
                                           Errors errors) throws JsonProcessingException {
 
         Message message = new Message();
@@ -105,6 +101,28 @@ public class UserController {
         message.setStatus(StatusEnum.OK);
         message.setMessage("현재 채널 변경 성공");
         message.setData(channelResponseDto);
+
+        return ResponseEntity.ok().body(message);
+    }
+
+    @PutMapping("/user/setting")
+    public ResponseEntity<Message> changeUserSetting(@RequestBody @Valid UserSettingRequestDto userSettingRequestDto,
+                                                     HttpServletRequest request,
+                                                     HttpServletResponse response,
+                                                     Errors errors) throws JsonProcessingException {
+        Message message = new Message();
+
+        String requestEmail = userService.getUserEmail(request);
+
+        UserResponseDto userResponseDto = userService.setUserSettings(requestEmail, userSettingRequestDto);
+
+        if (errors.hasErrors()) {
+            throw new FormValidException(objectMapper.writeValueAsString(errors));
+        }
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("유저 설정 변경 성공");
+        message.setData(userResponseDto);
 
         return ResponseEntity.ok().body(message);
     }
