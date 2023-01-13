@@ -21,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
@@ -44,19 +45,19 @@ public class SecurityConfiguration {
                 .disable()
             .csrf()
                 .disable()
-                .cors().configurationSource(corsConfigurationSource())
-                .and()
             .formLogin()
               .disable()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/user").permitAll()
                 .antMatchers(HttpMethod.GET, "/").permitAll()
-                .antMatchers(HttpMethod.GET, "/user/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/user").permitAll()
+                .antMatchers(HttpMethod.POST, "/user/login").permitAll()
                 .antMatchers("/admin/**").hasAnyAuthority(RoleType.ADMIN.getKey())
                 .anyRequest().authenticated()
+                .and()
+            .cors().configurationSource(corsConfigurationSource())
                 .and()
             .oauth2Login()
                 .authorizationEndpoint()
@@ -104,9 +105,10 @@ public class SecurityConfiguration {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(Arrays.asList(corsProperties.getAllowedOrigins()));
+        configuration.setAllowedOrigins(Arrays.asList(corsProperties.getAllowedOrigins().split(",")));
         configuration.setAllowedMethods(Arrays.asList(corsProperties.getAllowedMethods().split(",")));
         configuration.setAllowedHeaders(Arrays.asList(corsProperties.getAllowedHeaders().split(",")));
+
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
