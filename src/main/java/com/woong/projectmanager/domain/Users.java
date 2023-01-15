@@ -58,6 +58,7 @@ public class Users {
     @NotNull
     private LocalDateTime updatedAt;
 
+
     private boolean isSlackWebHook = false;
 
     private String slackWebHookUrl;
@@ -76,6 +77,8 @@ public class Users {
     public void changeSetting(UserSettingRequestDto userSettingRequestDto){
         this.isSlackWebHook = userSettingRequestDto.getIsSlackWebHook();
         this.slackWebHookUrl = userSettingRequestDto.getSlackWebHookUrl();
+
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void setEmail(String email) {
