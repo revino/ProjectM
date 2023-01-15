@@ -3,6 +3,7 @@ package com.woong.projectmanager.service;
 import com.woong.projectmanager.DatabaseTest;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
+import com.woong.projectmanager.dto.request.UserSettingRequestDto;
 import com.woong.projectmanager.dto.response.ChannelResponseDto;
 import com.woong.projectmanager.dto.request.UserSignUpRequestDto;
 import com.woong.projectmanager.dto.response.UserResponseDto;
@@ -90,5 +91,28 @@ class UserServiceTest extends DatabaseTest {
         var list= userService.getChannelList(userResponseDto.getEmail());
 
         Assertions.assertEquals(list.size(), 0);
+    }
+
+    @Test
+    public void 채널설정변경(){
+
+        //given
+        UserSignUpRequestDto userDto = new UserSignUpRequestDto();
+        userDto.setEmail("test4@test.com");
+        userDto.setPassword("1234");
+        userDto.setNickName("testName");
+
+        userService.signUp(userDto);
+
+        UserSettingRequestDto userSettingRequestDto = new UserSettingRequestDto();
+        userSettingRequestDto.setSlackWebHookUrl("http://test.com/test");
+
+        //when
+        userService.setUserSettings(userDto.getEmail(), userSettingRequestDto);
+
+        //then
+        UserResponseDto userResponseDto = userService.getUserEmail(userDto.getEmail());
+        Assertions.assertEquals(userResponseDto.getSlackWebHookUrl(), userSettingRequestDto.getSlackWebHookUrl());
+
     }
 }

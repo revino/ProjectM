@@ -60,7 +60,7 @@ public class UserService {
 
     public String signIn(UserSignInRequestDto userSignInRequestDto){
 
-        Users users = usersRepository.findByEmail(userSignInRequestDto.getEmail()).orElseThrow(EmailSignInFailedException::new);
+        Users users = usersRepository.findByEmail(userSignInRequestDto.getEmail()).orElseThrow(()-> new EmailSignInFailedException("존재 하지 않는 계정입니다."));
 
         //패스워드 확인
         if(!passwordEncoder.matches(userSignInRequestDto.getPassword(), users.getPassword())){
@@ -224,4 +224,27 @@ public class UserService {
         return email;
     }
 
+    @Transactional
+    public UserResponseDto getUserEmail(String email){
+
+        Users users = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+
+        UserResponseDto userResponseDto = new UserResponseDto(users);
+
+        return userResponseDto;
+    }
+
+    @Transactional
+    public UserResponseDto setUserSettings(String email, UserSettingRequestDto userSettingRequestDto){
+
+        Users user = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+
+        //설정 변경
+        user.changeSetting(userSettingRequestDto);
+
+        //Dto 생성하여 반환
+        UserResponseDto userResponseDto = new UserResponseDto(user);
+
+        return userResponseDto;
+    }
 }

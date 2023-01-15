@@ -1,6 +1,7 @@
 package com.woong.projectmanager.domain;
 
 import com.sun.istack.NotNull;
+import com.woong.projectmanager.dto.request.UserSettingRequestDto;
 import com.woong.projectmanager.provider.LoginProviderType;
 import lombok.*;
 
@@ -57,6 +58,10 @@ public class Users {
     @NotNull
     private LocalDateTime updatedAt;
 
+    private boolean isSlackWebHook = false;
+
+    private String slackWebHookUrl;
+
     public void addChannel(UserChannel userChannel){
         channelList.add(userChannel);
         userChannel.setUser(this);
@@ -66,6 +71,11 @@ public class Users {
         channelList.remove(userChannel);
         userChannel.setChannel(null);
         userChannel.setUser(null);
+    }
+
+    public void changeSetting(UserSettingRequestDto userSettingRequestDto){
+        this.isSlackWebHook = userSettingRequestDto.getIsSlackWebHook();
+        this.slackWebHookUrl = userSettingRequestDto.getSlackWebHookUrl();
     }
 
     public void setEmail(String email) {

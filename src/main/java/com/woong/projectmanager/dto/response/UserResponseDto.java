@@ -4,6 +4,7 @@ import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.UserChannel;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.provider.LoginProviderType;
+import com.woong.projectmanager.util.ResponseUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,10 @@ public class UserResponseDto {
 
     private ChannelResponseDto currentChannel;
 
+    private boolean isSlackWebHook;
+
+    private String slackWebHookUrl;
+
     private List<ChannelResponseDto> subscribeList = new ArrayList<>();
 
     public UserResponseDto(Users users){
@@ -35,6 +40,10 @@ public class UserResponseDto {
         this.nickName = users.getNickName();
         this.picture = users.getPicture();
         this.loginProviderType = users.getLoginProviderType();
+
+        //setting
+        this.isSlackWebHook = users.isSlackWebHook();
+        this.slackWebHookUrl = ResponseUtil.checkNull(users.getSlackWebHookUrl());
 
         for(UserChannel userChannel : users.getChannelList()){
             subscribeList.add(new ChannelResponseDto(userChannel));

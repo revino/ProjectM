@@ -29,6 +29,11 @@ public class ChannelService {
     @Transactional
     public ChannelResponseDto createChannel(ChannelCreateRequestDto channelCreateRequestDto, String managerEmail){
 
+        //validation
+        if(channelCreateRequestDto.getName().length() >= 30) {
+            throw new ChannelUpdateValidException("채널 이름이 10자 이상입니다." );
+        }
+
         //유저 찾기
         Users manager = usersRepository.findByEmail(managerEmail).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
@@ -51,7 +56,7 @@ public class ChannelService {
     public ChannelResponseDto updateChannel(Long channelId, ChannelCreateRequestDto channelCreateRequestDto, String requestEmail){
 
         //validation
-        if(channelCreateRequestDto.getName().length() >= 10) {
+        if(channelCreateRequestDto.getName().length() >= 30) {
             throw new ChannelUpdateValidException("채널 이름이 10자 이상입니다." );
         }
 
