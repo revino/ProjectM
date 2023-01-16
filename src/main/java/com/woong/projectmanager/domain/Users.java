@@ -72,6 +72,12 @@ public class Users {
         userChannel.setUser(this);
     }
 
+    public void removeChannel(UserChannel userChannel){
+        channelList.remove(userChannel);
+        userChannel.setChannel(null);
+        userChannel.setUser(null);
+    }
+
     public void addAlarmItem(AlarmUserItem alarmUserItem){
         alarmItemList.add(alarmUserItem);
         alarmUserItem.setUser(this);
@@ -81,12 +87,6 @@ public class Users {
         alarmItemList.remove(alarmUserItem);
         alarmUserItem.setItem(null);
         alarmUserItem.setUser(null);
-    }
-
-    public void removeChannel(UserChannel userChannel){
-        channelList.remove(userChannel);
-        userChannel.setChannel(null);
-        userChannel.setUser(null);
     }
 
     public void changeSetting(UserSettingRequestDto userSettingRequestDto){

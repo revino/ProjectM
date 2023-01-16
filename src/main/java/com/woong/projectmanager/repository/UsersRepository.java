@@ -15,6 +15,9 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     @Query("select distinct u from Users u left join fetch u.channelList where u.email = :email ")
     Optional<Users> findByEmailWithChannelList(@Param(value = "email")String email);
 
+    @Query("select distinct u from Users u left join fetch u.alarmItemList where u.email = :email ")
+    Optional<Users> findByEmailWithAAlarmItemList(@Param(value = "email")String email);
+
     @Query("select distinct u from Users u left join fetch u.currentChannel where u.email = :email")
     Optional<Users> findByEmailWithChannel(@Param(value = "email")String email);
 

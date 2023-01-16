@@ -108,12 +108,12 @@ public class ItemService {
 
     @Transactional
     public ItemResponseDto addAlarmUser(String email, Long itemId){
-        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Users member = usersRepository.findByEmailWithAAlarmItemList(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
         Item item = itemRepository.findById(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
 
-        //중복 구독 체크
-        if(!checkSubscribeAlarm(member, item)){
-            throw new ChannelSubscribeFailedException("이미 알람 설정 중인 아이템입니다.");
+        //중복 알람 체크
+        if(member.getAlarmItemList().stream().anyMatch(e-> e.getItem().getId().equals(item.getId()))){
+            throw new ItemAlarmAddFailedException("이미 알람 설정 중인 아이템입니다.");
         }
 
         //유저채널 생성
@@ -129,23 +129,19 @@ public class ItemService {
 
     @Transactional
     public ItemResponseDto removeAlarmUser(String email, Long itemId){
-        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Users member = usersRepository.findByEmailWithAAlarmItemList(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
         Item item = itemRepository.findById(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
 
         //유저아이템 찾기
-        AlarmUserItem alarmUserItem = alarmUserItemRepository.findByUserAndItem(member, item)
-                .orElseThrow(() -> new ChannelSubscribeFailedException("찾을 수 없는 아이템입니다."));
+        AlarmUserItem alarmUserItem = member
+                .getAlarmItemList().stream()
+                .filter(e-> e.getItem().getId().equals(itemId))
+                .findAny().orElseThrow(() -> new ItemFindFailedException("찾을 수 없는 아이템입니다."));
 
         //채널 제거
         member.removeAlarmItem(alarmUserItem);
         usersRepository.save(member);
 
         return new ItemResponseDto(item);
-    }
-
-    private boolean checkSubscribeAlarm(Users user, Item item){
-
-        return alarmUserItemRepository.findByUserAndItem(user, item).isEmpty();
-
     }
 }
