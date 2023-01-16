@@ -38,6 +38,10 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChannel> channelList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AlarmUserItem> alarmItemList = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id")
     private Channel currentChannel;
@@ -59,13 +63,24 @@ public class Users {
     private LocalDateTime updatedAt;
 
 
-    private boolean isSlackWebHook = false;
+    private boolean isSlackWebHook;
 
     private String slackWebHookUrl;
 
     public void addChannel(UserChannel userChannel){
         channelList.add(userChannel);
         userChannel.setUser(this);
+    }
+
+    public void addAlarmItem(AlarmUserItem alarmUserItem){
+        alarmItemList.add(alarmUserItem);
+        alarmUserItem.setUser(this);
+    }
+
+    public void removeAlarmItem(AlarmUserItem alarmUserItem){
+        alarmItemList.remove(alarmUserItem);
+        alarmUserItem.setItem(null);
+        alarmUserItem.setUser(null);
     }
 
     public void removeChannel(UserChannel userChannel){

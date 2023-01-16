@@ -44,7 +44,7 @@ class UserServiceTest extends DatabaseTest {
         userService.signUp(userDto);
 
         //then
-        UserResponseDto user = userService.findUserEmail(userDto.getEmail());
+        UserResponseDto user = userService.getUserInfo(userDto.getEmail());
 
         Assertions.assertEquals(user.getEmail(), userDto.getEmail());
     }
@@ -85,7 +85,7 @@ class UserServiceTest extends DatabaseTest {
         ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
 
         //when
-        userService.removeChannel(userResponseDto.getEmail(), channel.getId());
+        userService.unSubscribeChannel(userResponseDto.getEmail(), channel.getId());
 
         //then
         var list= userService.getChannelList(userResponseDto.getEmail());

@@ -8,5 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserChannelRepository extends JpaRepository<UserChannel, Long> {
-    Optional<UserChannel> findByUserAndChannel (Users user, Channel channel);
+    Optional<UserChannel> findByUserAndChannel (Long userId, Long channelId);
+
 }

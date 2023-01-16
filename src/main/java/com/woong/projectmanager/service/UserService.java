@@ -71,12 +71,12 @@ public class UserService {
     }
 
     @Transactional
-    public List<ChannelResponseDto> addChannel(String email, Long channelId){
-        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+    public List<ChannelResponseDto> subscribeChannel(String email, Long channelId){
+        Users member = usersRepository.findByEmailWithChannelList(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
         Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
-        //중복 구독 체크
-        if(!checkSubscribe(member, channel)){
+        //구독 중복 체크
+        if(member.getChannelList().stream().anyMatch(e-> e.getChannel().getId().equals(channel.getId()))){
             throw new ChannelSubscribeFailedException("이미 구독 중인 채널입니다.");
         }
 
@@ -86,35 +86,45 @@ public class UserService {
         //채널 추가
         member.addChannel(userChannel);
 
-        ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
+        return getChannelList(member);
+    }
+
+    @Transactional
+    public List<ChannelResponseDto> unSubscribeChannel(String email, Long channelId){
+        Users member = usersRepository.findByEmailWithChannelList(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+
+        //유저채널 찾기
+        UserChannel userChannel = member
+                .getChannelList().stream()
+                .filter(e-> e.getChannel().getId().equals(channelId))
+                .findAny().orElseThrow(() -> new ChannelSubscribeFailedException("찾을 수 없는 채널입니다."));
+
+        //채널 제거
+        member.removeChannel(userChannel);
+        usersRepository.save(member);
 
         return getChannelList(member);
     }
 
     @Transactional
-    public List<ChannelResponseDto> addChannel(Users user, Channel channel){
+    public void subscribeChannelWithoutCheck(Users user, Channel channel){
 
         //유저채널 생성
         UserChannel userChannel = UserChannel.createUserChannel(user, channel);
 
-        //중복 구독 체크
-        if(!checkSubscribe(user, channel)){
-            throw new ChannelSubscribeFailedException("이미 구독 중인 채널입니다.");
-        }
-
         //채널 추가
         user.addChannel(userChannel);
 
-        return getChannelList(user);
+        return;
     }
 
     @Transactional
     public ChannelResponseDto setCurrentChannel(String email, Long channelId){
-        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
-        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
+        Users member = usersRepository.findByEmailWithChannel(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Channel channel = channelRepository.findByIdWithManager(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
         //중복 구독 체크
-        if(checkSubscribe(member, channel)){
+        if(userChannelRepository.findByUserAndChannel(member.getId(), channelId).isEmpty()){
             throw new ChannelSubscribeFailedException("변경 불가능한 채널입니다.");
         }
 
@@ -124,35 +134,20 @@ public class UserService {
         return new ChannelResponseDto(channel);
     }
 
-    @Transactional
-    public List<ChannelResponseDto> removeChannel(String email, Long channelId){
-        Users member = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
-        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
-
-        //유저채널 찾기
-        UserChannel userChannel = userChannelRepository.findByUserAndChannel(member, channel)
-                .orElseThrow(() -> new ChannelSubscribeFailedException("찾을 수 없는 채널입니다."));
-
-        //채널 제거
-        member.removeChannel(userChannel);
-        usersRepository.save(member);
-
-        return getChannelList(member);
-    }
-
-    public UserResponseDto findUserEmail(String email){
-        Users user = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+    public UserResponseDto getUserInfo(String email){
+        Users user = usersRepository.findByEmailWithAllChannel(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
         return new UserResponseDto(user);
     }
 
     public List<ChannelResponseDto> getChannelList(String email){
-        Users user = usersRepository.findByEmail(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        Users user = usersRepository.findByEmailWithChannelList(email).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
         //Dto 생성하여 반환
         List<ChannelResponseDto> channelDtoList = user
                                                 .getChannelList().stream()
-                                                .map(el -> new ChannelResponseDto(el.getChannel())).collect(Collectors.toList());
+                                                .map(el -> new ChannelResponseDto(el.getChannel()))
+                                                .collect(Collectors.toList());
 
         return channelDtoList;
     }
@@ -162,7 +157,8 @@ public class UserService {
         //Dto 생성하여 반환
         List<ChannelResponseDto> channelDtoList = user
                 .getChannelList().stream()
-                .map(el -> new ChannelResponseDto(el.getChannel())).collect(Collectors.toList());
+                .map(el -> new ChannelResponseDto(el.getChannel()))
+                .collect(Collectors.toList());
 
         return channelDtoList;
     }
@@ -172,12 +168,6 @@ public class UserService {
                 users.getEmail(),
                 users.getRole(),
                 appProperties.getAuth().getTokenExpiry());
-    }
-
-    private boolean checkSubscribe(Users user, Channel channel){
-
-        return userChannelRepository.findByUserAndChannel(user, channel).isEmpty();
-
     }
 
     @Transactional

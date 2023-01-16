@@ -53,13 +53,13 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<Message> signIn(HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity<Message> getUserInfo(HttpServletRequest request) throws JsonProcessingException {
 
         Message message = new Message();
 
         String requestEmail = userService.getUserEmail(request);
 
-        UserResponseDto userResponseDto = userService.findUserEmail(requestEmail);
+        UserResponseDto userResponseDto = userService.getUserInfo(requestEmail);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("회원 정보 반환 성공");

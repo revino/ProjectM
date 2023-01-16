@@ -1,5 +1,6 @@
 package com.woong.projectmanager.dto.response;
 
+import com.woong.projectmanager.domain.AlarmUserItem;
 import com.woong.projectmanager.domain.Channel;
 import com.woong.projectmanager.domain.UserChannel;
 import com.woong.projectmanager.domain.Users;
@@ -10,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Data @NoArgsConstructor
@@ -34,6 +34,8 @@ public class UserResponseDto {
 
     private List<ChannelResponseDto> subscribeList = new ArrayList<>();
 
+    private List<ItemResponseDto> alarmItemList = new ArrayList<>();
+
     public UserResponseDto(Users users){
         Channel currentChannel = users.getCurrentChannel();
         this.email = users.getEmail();
@@ -46,11 +48,15 @@ public class UserResponseDto {
         this.slackWebHookUrl = ResponseUtil.checkNull(users.getSlackWebHookUrl());
 
         for(UserChannel userChannel : users.getChannelList()){
-            subscribeList.add(new ChannelResponseDto(userChannel));
+            subscribeList.add(new ChannelResponseDto(userChannel.getChannel()));
         }
 
         if(currentChannel != null) {
             this.currentChannel = new ChannelResponseDto(currentChannel);
+        }
+
+        for(AlarmUserItem alarmUserItem : users.getAlarmItemList()){
+            alarmItemList.add(new ItemResponseDto(alarmUserItem));
         }
     }
 

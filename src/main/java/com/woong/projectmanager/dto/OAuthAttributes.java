@@ -58,6 +58,7 @@ public class OAuthAttributes {
                 .picture(picture)
                 .loginProviderType(loginProviderType)
                 .role(RoleType.USER)
+                .isSlackWebHook(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

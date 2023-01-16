@@ -113,7 +113,7 @@ public class ChannelController {
 
         String requestEmail = userService.getUserEmail(request);
 
-        List<ChannelResponseDto> channelResponseDtoList = userService.addChannel(requestEmail, id);
+        List<ChannelResponseDto> channelResponseDtoList = userService.subscribeChannel(requestEmail, id);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("채널 구독 성공");
@@ -129,7 +129,7 @@ public class ChannelController {
 
         String requestEmail = userService.getUserEmail(request);
 
-        List<ChannelResponseDto> channelResponseDtoList = userService.removeChannel(requestEmail, id);
+        List<ChannelResponseDto> channelResponseDtoList = userService.unSubscribeChannel(requestEmail, id);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("채널 구독 해제");

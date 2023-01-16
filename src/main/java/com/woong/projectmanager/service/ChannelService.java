@@ -31,7 +31,7 @@ public class ChannelService {
 
         //validation
         if(channelCreateRequestDto.getName().length() >= 30) {
-            throw new ChannelUpdateValidException("채널 이름이 10자 이상입니다." );
+            throw new ChannelUpdateValidException("채널 이름이 30자 이상입니다." );
         }
 
         //유저 찾기
@@ -45,7 +45,7 @@ public class ChannelService {
         channelRepository.save(channel);
 
         //생성한 채널에 유저 추가
-        userService.addChannel(manager, channel);
+        userService.subscribeChannelWithoutCheck(manager, channel);
 
         ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
 
@@ -57,10 +57,10 @@ public class ChannelService {
 
         //validation
         if(channelCreateRequestDto.getName().length() >= 30) {
-            throw new ChannelUpdateValidException("채널 이름이 10자 이상입니다." );
+            throw new ChannelUpdateValidException("채널 이름이 30자 이상입니다." );
         }
 
-        Channel channel = channelRepository.findById(channelId).orElseThrow(()-> new ItemFindFailedException("존재하지 않는 채널입니다."));
+        Channel channel = channelRepository.findByIdWithManager(channelId).orElseThrow(()-> new ItemFindFailedException("존재하지 않는 채널입니다."));
         String managerEmail = channel.getManager().getEmail();
 
         if(!managerEmail.equals(requestEmail)){
@@ -80,18 +80,18 @@ public class ChannelService {
     public ChannelResponseDto removeChannel(Long id, String requestEmail){
 
         //채널 찾기
-        Channel channel = channelRepository.findById(id).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
+        Channel channel = channelRepository.findByIdWithAllMember(id).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
         String managerEmail = channel.getManager().getEmail();
 
         //관리자 아이디 확인
         if(!managerEmail.equals(requestEmail)){
-            throw new RemoveChannelFailedException("수정 권하이 없습니다. " + managerEmail);
+            throw new RemoveChannelFailedException("수정 권한이 없습니다. " + managerEmail);
         }
 
         //구독자 해제
         for (UserChannel userChannel: channel.getMemberList()) {
-            Users user = userChannel.getUser();
-            user.removeChannel(userChannel);
+            userChannel.setChannel(null);
+            userChannel.setUser(null);
         }
 
         //삭제
@@ -110,7 +110,7 @@ public class ChannelService {
 
     public ChannelResponseDto findChannel(Long channelId){
 
-        Channel channel = channelRepository.findById(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
+        Channel channel = channelRepository.findByIdWithManager(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
         ChannelResponseDto channelResponseDto = new ChannelResponseDto(channel);
 

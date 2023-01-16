@@ -32,6 +32,9 @@ public class Item {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contents> contentsList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<AlarmUserItem> alarmUserList = new ArrayList<>();
+
     @NotNull
     private String name;
 
