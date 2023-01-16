@@ -1,6 +1,8 @@
 package com.woong.projectmanager.service;
 
 import com.woong.projectmanager.DatabaseTest;
+import com.woong.projectmanager.domain.AlarmUserItem;
+import com.woong.projectmanager.domain.Item;
 import com.woong.projectmanager.domain.Users;
 import com.woong.projectmanager.dto.request.ChannelCreateRequestDto;
 import com.woong.projectmanager.dto.request.ItemAddRequestDto;
@@ -84,5 +86,38 @@ class ItemServiceTest extends DatabaseTest {
         var list = itemService.getItemList(channel.getId());
         Assertions.assertEquals(list.size(), 0);
     }
+
+    @Test
+    public void 아이템구독(){
+        //given
+        UserSignUpRequestDto userDto = new UserSignUpRequestDto();
+        userDto.setEmail("test2@test.com");
+        userDto.setPassword("1234");
+        userDto.setNickName("testName");
+        UserResponseDto userResponseDto = userService.signUp(userDto);
+
+        ChannelCreateRequestDto channelDto = new ChannelCreateRequestDto();
+        channelDto.setName("테스트채널2");
+        ChannelResponseDto channel = channelService.createChannel(channelDto, userDto.getEmail());
+
+        ItemAddRequestDto itemDto = new ItemAddRequestDto();
+        itemDto.setName("테스트 아이템");
+        itemDto.setStartDate(LocalDate.now());
+        itemDto.setEndDate(LocalDate.now().plusDays(1));
+        itemDto.setChannelId(channel.getId());
+        itemDto.setStatus("대기중");
+        ItemResponseDto makeItem = itemService.createItem(itemDto, userDto.getEmail());
+
+        //
+        var list= itemService.addAlarmUser(userDto.getEmail(), makeItem.getId());
+
+        //
+        UserResponseDto user = userService.getUserInfo(userDto.getEmail());
+        ItemResponseDto item = user.getAlarmItemList().get(0);
+
+        Assertions.assertEquals(item.getId(), makeItem.getId());
+        Assertions.assertEquals(item.getName(), makeItem.getName());
+    }
+
 
 }

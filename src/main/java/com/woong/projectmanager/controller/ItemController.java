@@ -32,6 +32,8 @@ public class ItemController {
                                                HttpServletRequest request){
         Message message = new Message();
 
+        String requestEmail = userService.getUserEmail(request);
+
         //아이템 조회
         List<ItemResponseDto> itemResponseDto = itemService.getItemList(id);
 
@@ -64,8 +66,42 @@ public class ItemController {
         return ResponseEntity.ok().body(message);
     }
 
+    @PostMapping("/item/alarm/{id}")
+    public ResponseEntity<Message> addAlarmItem(@PathVariable Long id,
+                                                HttpServletRequest request) {
+        Message message = new Message();
+
+        String managerEmail = userService.getUserEmail(request);
+
+        //아이템 알람 설정
+        ItemResponseDto itemResponseDto = itemService.addAlarmUser(managerEmail, id);
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("아이템 알람 설정 성공");
+        message.setData(itemResponseDto);
+
+        return ResponseEntity.ok().body(message);
+    }
+
+    @DeleteMapping("/item/alarm/{id}")
+    public ResponseEntity<Message> removeAlarmItem(@PathVariable Long id,
+                                                HttpServletRequest request) {
+        Message message = new Message();
+
+        String managerEmail = userService.getUserEmail(request);
+
+        //아이템 알람 해제
+        ItemResponseDto itemResponseDto = itemService.removeAlarmUser(managerEmail, id);
+
+        message.setStatus(StatusEnum.OK);
+        message.setMessage("아이템 알람 해제 성공");
+        message.setData(itemResponseDto);
+
+        return ResponseEntity.ok().body(message);
+    }
+
     @GetMapping("/item/{id}")
-    public ResponseEntity<Message> getItem(@PathVariable Long id) throws JsonProcessingException {
+    public ResponseEntity<Message> getItem(@PathVariable Long id, HttpServletRequest request){
         Message message = new Message();
 
         //아이템 조회
