@@ -15,10 +15,10 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
     @Query("select distinct c from Channel c join fetch c.manager where c.id = :id ")
     Optional<Channel> findByIdWithManager(@Param(value = "id") Long id);
 
-    @Query("select c from Channel c left join fetch c.memberList left join fetch c.manager where c.id = :id ")
+    @Query("select distinct c from Channel c left join fetch c.memberList left join fetch c.manager where c.id = :id ")
     Optional<Channel> findByIdWithAllMember(@Param(value = "id") Long id);
 
-    @Query("select c from Channel c left join fetch c.itemList where c.id = :id ")
+    @Query("select distinct c from Channel c left join fetch c.itemList where c.id = :id ")
     Optional<Channel> findByIdWithAllItem(@Param(value = "id") Long id);
 
 }
