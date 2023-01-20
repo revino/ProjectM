@@ -54,7 +54,7 @@ class ItemServiceTest extends DatabaseTest {
         ItemResponseDto itemResponseDto = itemService.createItem(itemDto, userDto.getEmail());
 
         //
-        var list = itemService.getItemList(channel.getId());
+        var list = itemService.getItemList(channel.getId(),userDto.getEmail());
         Assertions.assertEquals(list.size(), 1);
         Assertions.assertEquals(list.get(0).getWriterEmail(), userDto.getEmail());
     }
@@ -83,7 +83,7 @@ class ItemServiceTest extends DatabaseTest {
         itemService.removeItem(itemResponseDto.getId(), userDto.getEmail());
 
         //
-        var list = itemService.getItemList(channel.getId());
+        var list = itemService.getItemList(channel.getId(), userDto.getEmail());
         Assertions.assertEquals(list.size(), 0);
     }
 

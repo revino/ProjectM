@@ -26,6 +26,9 @@ public class ItemResponseDto {
     private Long channelId;
 
     @NotEmpty
+    private String channelName;
+
+    @NotEmpty
     private String status;
 
     @NotEmpty
@@ -41,6 +44,7 @@ public class ItemResponseDto {
         this.name = item.getName();
         this.writerEmail = item.getWriter().getEmail();
         this.channelId = item.getChannel().getId();
+        this.channelName = item.getChannel().getName();
         this.status = item.getStatus();
         this.startDate = item.getStartDate();
         this.endDate = item.getEndDate();
@@ -51,6 +55,7 @@ public class ItemResponseDto {
         this.name = item.getName();
         this.writerEmail = item.getWriter().getEmail();
         this.channelId = item.getChannel().getId();
+        this.channelName = item.getChannel().getName();
         this.status = item.getStatus();
         this.startDate = item.getStartDate();
         this.endDate = item.getEndDate();
@@ -66,6 +71,7 @@ public class ItemResponseDto {
         this.name = item.getName();
         this.writerEmail = item.getWriter().getEmail();
         this.channelId = item.getChannel().getId();
+        this.channelName = item.getChannel().getName();
         this.status = item.getStatus();
         this.startDate = item.getStartDate();
         this.endDate = item.getEndDate();

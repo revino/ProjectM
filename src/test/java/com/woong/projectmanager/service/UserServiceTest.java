@@ -105,6 +105,7 @@ class UserServiceTest extends DatabaseTest {
         userService.signUp(userDto);
 
         UserSettingRequestDto userSettingRequestDto = new UserSettingRequestDto();
+        userSettingRequestDto.setIsSlackWebHook(false);
         userSettingRequestDto.setSlackWebHookUrl("http://test.com/test");
 
         //when

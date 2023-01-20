@@ -16,4 +16,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select distinct i from Item i left join fetch i.contentsList left join fetch i.writer left join fetch i.channel where i.id = :id ")
     Optional<Item> findByIdWithAll(@Param(value = "id") Long id);
 
+    @Query("select distinct i from Item i left join fetch i.alarmUserList where i.id = :id ")
+    Optional<Item> findByIdWithAllAlarmUser(@Param(value = "id") Long id);
+
+
+
 }

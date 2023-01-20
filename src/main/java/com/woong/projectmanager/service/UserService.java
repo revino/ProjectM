@@ -124,7 +124,7 @@ public class UserService {
         Channel channel = channelRepository.findByIdWithManager(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
 
         //중복 구독 체크
-        if(userChannelRepository.findByUserAndChannel(member.getId(), channelId).isEmpty()){
+        if(userChannelRepository.findByUserAndChannel(member, channel).isEmpty()){
             throw new ChannelSubscribeFailedException("변경 불가능한 채널입니다.");
         }
 

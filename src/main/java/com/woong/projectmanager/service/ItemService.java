@@ -82,15 +82,20 @@ public class ItemService {
         return new ItemResponseDto(item);
     }
 
-    public List<ItemResponseDto> getItemList(Long channelId){
+    public List<ItemResponseDto> getItemList(Long channelId, String requestEmail){
 
         Channel channel = channelRepository.findByIdWithAllItem(channelId).orElseThrow(()->new ChannelFindFailedException("존재하지 않는 채널 입니다."));
+        Users member = usersRepository.findByEmailWithAAlarmItemList(requestEmail).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
+        List<AlarmUserItem> alarmItemList = member.getAlarmItemList();
 
         //DTO 생성하여 반환
         List<ItemResponseDto> itemDtoList = new ArrayList<>();
 
         for(var el : channel.getItemList()){
-            ItemResponseDto itemResponseDto = new ItemResponseDto(el);
+            boolean isSubscribe = alarmItemList.stream().
+                    filter(e-> e.getItem().getId().equals(el.getId()))
+                    .findAny().isPresent();
+            ItemResponseDto itemResponseDto = new ItemResponseDto(el, isSubscribe);
             itemDtoList.add(itemResponseDto);
         }
 
@@ -98,11 +103,16 @@ public class ItemService {
 
     }
 
-    public ItemResponseDto getItem(Long itemId){
+    public ItemResponseDto getItem(Long itemId, String requestEmail){
 
         Item item = itemRepository.findByIdWithWriterAndChannel(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
+        Users member = usersRepository.findByEmailWithAAlarmItemList(requestEmail).orElseThrow(()->new UserFindFailedException("존재하지 않는 유저입니다."));
 
-        return new ItemResponseDto(item);
+        boolean isSubscribe = member.getAlarmItemList().stream().
+                filter(e-> e.getItem().getId().equals(item.getId()))
+                .findAny().isPresent();
+
+        return new ItemResponseDto(item, isSubscribe);
 
     }
 
@@ -122,7 +132,7 @@ public class ItemService {
         //채널 추가
         member.addAlarmItem(alarmUserItem);
 
-        ItemResponseDto itemResponseDto = new ItemResponseDto(item);
+        ItemResponseDto itemResponseDto = new ItemResponseDto(item, true);
 
         return itemResponseDto;
     }
@@ -142,6 +152,6 @@ public class ItemService {
         member.removeAlarmItem(alarmUserItem);
         usersRepository.save(member);
 
-        return new ItemResponseDto(item);
+        return new ItemResponseDto(item, false);
     }
 }

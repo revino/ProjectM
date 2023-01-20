@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import com.woong.projectmanager.dto.request.UserSettingRequestDto;
 import com.woong.projectmanager.provider.LoginProviderType;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -62,7 +63,7 @@ public class Users {
     @NotNull
     private LocalDateTime updatedAt;
 
-
+    @ColumnDefault("false")
     private boolean isSlackWebHook;
 
     private String slackWebHookUrl;

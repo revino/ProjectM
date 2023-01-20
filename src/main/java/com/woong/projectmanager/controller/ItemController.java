@@ -35,7 +35,7 @@ public class ItemController {
         String requestEmail = userService.getUserEmail(request);
 
         //아이템 조회
-        List<ItemResponseDto> itemResponseDto = itemService.getItemList(id);
+        List<ItemResponseDto> itemResponseDto = itemService.getItemList(id, requestEmail);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("아이템 리스트 조회 성공");
@@ -104,8 +104,10 @@ public class ItemController {
     public ResponseEntity<Message> getItem(@PathVariable Long id, HttpServletRequest request){
         Message message = new Message();
 
+        String requestEmail = userService.getUserEmail(request);
+
         //아이템 조회
-        ItemResponseDto itemResponseDto = itemService.getItem(id);
+        ItemResponseDto itemResponseDto = itemService.getItem(id, requestEmail);
 
         message.setStatus(StatusEnum.OK);
         message.setMessage("아이템 조회 성공");
