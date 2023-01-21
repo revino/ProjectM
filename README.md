@@ -10,3 +10,7 @@
 
 ## 인프라 다이어그램
 ![AWS](https://user-images.githubusercontent.com/10641982/213872682-41d20d75-3355-412e-98d4-463f3670a063.png)
+
+## ERD
+![projectM-erd](https://user-images.githubusercontent.com/10641982/213872781-86f0b174-5d74-4abf-9e4a-e2e32f7a534e.png)
+
