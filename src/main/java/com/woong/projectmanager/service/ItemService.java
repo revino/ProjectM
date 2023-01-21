@@ -70,7 +70,7 @@ public class ItemService {
     @Transactional
     public ItemResponseDto removeItem(Long itemId, String requestEmail){
 
-        Item item = itemRepository.findByIdWithAll(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
+        Item item = itemRepository.findByIdWithWriterAndChannel(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
         String managerEmail = item.getWriter().getEmail();
 
         if(!managerEmail.equals(requestEmail)){

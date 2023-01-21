@@ -7,7 +7,4 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlarmUserItemRepository  extends JpaRepository<AlarmUserItem, Long> {
-    Optional<AlarmUserItem> findByUserAndItem (Users user, Item item);
-
-    List<AlarmUserItem> findAllByUser(Users users);
 }

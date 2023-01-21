@@ -15,7 +15,6 @@ import com.woong.projectmanager.repository.ContentsRepository;
 import com.woong.projectmanager.repository.ItemRepository;
 import com.woong.projectmanager.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,9 +73,8 @@ public class ContentsService {
 
     public List<ContentsResponseDto> getContentsList(Long itemId){
 
-        Item item = itemRepository.findById(itemId).orElseThrow(()-> new ItemFindFailedException("일치하는 아이템이 없습니다."));
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        var contentsList = contentsRepository.findAllByItem(item, sort).orElseThrow(()->new ContentFindFailedException("컨텐츠가 존재 하지 않습니다."));
+        var contentsList = contentsRepository.findAllByItem(itemId, sort).orElseThrow(()->new ContentFindFailedException("컨텐츠가 존재 하지 않습니다."));
 
         //DTO 생성하여 반환
         List<ContentsResponseDto> contentsDtoList = new ArrayList<>();
